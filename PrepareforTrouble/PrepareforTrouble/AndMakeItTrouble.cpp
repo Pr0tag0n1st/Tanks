@@ -4,6 +4,8 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
 #include <vector>
 using namespace std;
 const int screenwidth = 1200;
@@ -18,9 +20,9 @@ int main() {
 	ALLEGRO_DISPLAY*display = NULL;
 	ALLEGRO_TIMER*timer = NULL;
 	ALLEGRO_EVENT_QUEUE*event_queue = NULL;
-	ALLEGRO_BITMAP*tank = NULL;
+	ALLEGRO_BITMAP*tank1 = NULL;
 	ALLEGRO_BITMAP*wall = NULL;
-	ALLEGRO_BITMAP*dot = NULL;
+	ALLEGRO_BITMAP*tank2 = NULL;
 	ALLEGRO_SAMPLE*bite = NULL;
 	ALLEGRO_SAMPLE*win = NULL;
 	ALLEGRO_SAMPLE*lose = NULL;
@@ -75,19 +77,19 @@ int main() {
 		al_attach_sample_instance_to_mixer(instance, al_get_default_mixer());
 		al_play_sample_instance(instance);
 		display = al_create_display(800, 840);
-		pacman = al_create_bitmap(32, 32);
+		tank1 = al_create_bitmap(32, 32);
+		tank2 = al_create_bitmap(4, 4);
 		wall = al_create_bitmap(40, 40);
-		dot = al_create_bitmap(4, 4);
-		al_set_target_bitmap(pacman);
+		al_set_target_bitmap(tank1);
+		al_clear_to_color(al_map_rgb(255, 255, 0));
+		al_set_target_bitmap(tank2);
 		al_clear_to_color(al_map_rgb(255, 255, 0));
 		al_set_target_bitmap(wall);
 		al_clear_to_color(al_map_rgb(200, 200, 255));
-		al_set_target_bitmap(dot);
-		al_clear_to_color(al_map_rgb(255, 255, 0));
 		al_set_target_bitmap(al_get_backbuffer(display));
 		al_register_event_source(event_queue, al_get_display_event_source(display));
 		al_register_event_source(event_queue, al_get_timer_event_source(timer));
 		al_register_event_source(event_queue, al_get_keyboard_event_source());
-
+		al_clear_to_color(al_map_rgb(0, 0, 0));
 
 }
