@@ -124,12 +124,15 @@ int main() {
 			}
 			if (p1keys[KEY_DOWN] && !Collision(tank1_x, tank1_y, tank1_angle, DOWN, playersize, map)) {
 				tank1_x -= 4 * cos(3.14*tank1_angle / 180);
-				tank1_y -= 4 * cos(3.14*tank1_angle / 180);
+				tank1_y -= 4 * sin(3.14*tank1_angle / 180);
 			}
 			if (p1keys[KEY_LEFT])
 				tank1_angle -= 1;
 			if (p1keys[KEY_RIGHT])
 				tank1_angle += 1;
+			if (p2keys[KEY_UP] && !Collision(tank2_x, tank2_y, tank1_angle, UP, playersize, map)) {
+				tank2_x += 4 * cos(3.14*tank2_angle / 180);
+			}
 		}
 
 
