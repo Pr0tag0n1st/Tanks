@@ -14,9 +14,11 @@ const int playersize = 40;
 enum KEYS1 { KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_M};
 enum KEYS2 { KEY_W, KEY_S, KEY_A, KEY_D, KEY_Q };
 enum DIRECTIONS { UP, DOWN, LEFT, RIGHT };
+bool Collision(int x, int y, int angle, int dir, int size, int map[120][80]);
 
 int main() {
-
+	bool p1keys[5]{ false, false, false, false, false };
+	bool p2keys[5]{ false, false, false, false, false };
 	ALLEGRO_DISPLAY*display = NULL;
 	ALLEGRO_TIMER*timer = NULL;
 	ALLEGRO_EVENT_QUEUE*event_queue = NULL;
@@ -35,6 +37,8 @@ int main() {
 	bool doexit = false;
 	int tank1_x = 60;
 	int tank1_y = 60;
+	int tank1_angle = 0;
+	int tank2_angle = 0;
 	int tank2_x = 1120;
 	int tank2_y = 60;
 	int tank1score = 0;
@@ -106,8 +110,45 @@ int main() {
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(event_queue, &ev);
 		if (ev.type == ALLEGRO_EVENT_TIMER) {
-			
+			if (tank1_angle < 0)
+				tank1_angle = 360;
+			if (tank1_angle > 360)
+				tank1_angle = 0;
+			if (tank2_angle < 0)
+				tank2_angle = 360;
+			if (tank2_angle > 360)
+				tank2_angle = 0;
+			if (p1keys[KEY_UP] && !Collision(tank1_x, tank1_y, tank1_angle, UP, playersize, map)) {
+			tank1_x += 4 * cos(3.14*tank1_angle / 180);
+			tank1_y += 4 * sin(3.14*tank1_angle / 180);
+			}
+			if (p1keys[KEY_DOWN] && !Collision(tank1_x, tank1_y, tank1_angle, DOWN, playersize, map)) {
+				tank1_x -= 4 * cos(3.14*tank1_angle / 180);
+				tank1_y -= 4 * cos(3.14*tank1_angle / 180);
+			}
+			if (p1keys[KEY_LEFT])
+				tank1_angle -= 1;
+			if (p1keys[KEY_RIGHT])
+				tank1_angle += 1;
 		}
 
+
 	}
+}
+
+bool Collision(int x, int y, int angle, int dir, int size, int map[120][80]) {
+	int NewX;
+	int NewY;
+	if (dir == UP) {
+		NewX = x + (4 + playersize) * cos(angle / 180);
+		NewY = y + (4 + playersize) * sin(angle / 180);
+	}
+	else {
+		NewX = x - (4 + playersize) * cos(angle / 180);
+		NewY = y - (4 + playersize) * sin(angle / 180);
+	}
+	if (map[NewX / 10][NewY / 10] == 1)
+		return 1;
+	else
+		return false;
 }
