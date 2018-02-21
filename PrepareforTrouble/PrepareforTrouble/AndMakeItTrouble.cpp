@@ -35,6 +35,9 @@ int main() {
 	ALLEGRO_FONT*font = NULL;
 
 	bool doexit = false;
+	bool redraw;
+	int tanksize = 32;
+	int wallsize = 10;
 	int tank1_x = 60;
 	int tank1_y = 60;
 	int tank1_angle = 0;
@@ -90,9 +93,9 @@ int main() {
 	al_attach_sample_instance_to_mixer(instance, al_get_default_mixer());
 	al_play_sample_instance(instance);
 	display = al_create_display(800, 840);
-	tank1 = al_create_bitmap(32, 32);
-	tank2 = al_create_bitmap(4, 4);
-	wall = al_create_bitmap(40, 40);
+	tank1 = al_create_bitmap(tanksize, tanksize);
+	tank2 = al_create_bitmap(tanksize, tanksize);
+	wall = al_create_bitmap(wallsize, wallsize);
 	al_set_target_bitmap(tank1);
 	al_clear_to_color(al_map_rgb(255, 255, 0));
 	al_set_target_bitmap(tank2);
@@ -109,7 +112,7 @@ int main() {
 	while (doexit != true && tank1score < maxscore && tank2score < maxscore) {
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(event_queue, &ev);
-		if (ev.type == ALLEGRO_EVENT_TIMER) {
+		if (ev.type == ALLEGRO_EVENT_TIMER) { //Movement section
 			if (tank1_angle < 0)
 				tank1_angle = 360;
 			if (tank1_angle > 360)
@@ -134,10 +137,25 @@ int main() {
 				tank2_x += 4 * cos(3.14*tank2_angle / 180);
 			}
 		}
+		//render section
+		if (redraw && al_is_event_queue_empty(event_queue)) {
+			redraw = false;
 
+			//paint black over the old screen, so the old square dissapears
+			al_clear_to_color(al_map_rgb(0, 0, 0));
 
+			//the algorithm above just changes the x and y coordinates
+			//here's where the bitmap is actually drawn somewhere else
+			for (int i = 0; i < 120; i++)
+				for (int j = 0; j < 80; j++)
+					if (map[j][i] == 1)
+						al_draw_bitmap(wall, i * wallsize, j * wallsize, 0);
+
+			al_draw_rotated_bitmap(tank1, tanksize/2, tanksize/2, tank1_x, tank1_y, tank1_angle, 0);
+			al_draw_rotated_bitmap(tank2, tanksize/2, tanksize/2, tank2_x, tank2_y, tank2_angle, 0);
+			al_flip_display();
 	}
-}
+
 
 bool Collision(int x, int y, int angle, int dir, int size, int map[120][80]) {
 	int NewX;
