@@ -10,11 +10,10 @@
 using namespace std;
 const int screenwidth = 1200;
 const int screenheight = 800;
-const int playersize = 40;
 enum KEYS1 { KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_M};
 enum KEYS2 { KEY_W, KEY_S, KEY_A, KEY_D, KEY_Q };
 enum DIRECTIONS { UP, DOWN, LEFT, RIGHT };
-bool Collision(int x, int y, int angle, int dir, int size, int map[120][80]);
+//bool Collision(int x, int y, int angle, int dir, int size, int map[120][80]);
 
 int main() {
 	bool p1keys[5]{ false, false, false, false, false };
@@ -30,14 +29,13 @@ int main() {
 	ALLEGRO_SAMPLE*lose = NULL;
 	ALLEGRO_SAMPLE*background = NULL;
 	ALLEGRO_SAMPLE_INSTANCE*instance = NULL;
-	ALLEGRO_EVENT_QUEUE*event_queue = NULL;
-	ALLEGRO_TIMER*timer = NULL;
 	ALLEGRO_FONT*font = NULL;
 
 	bool doexit = false;
 	bool redraw;
-	int tanksize = 32;
+	int tanksize = 40;
 	int wallsize = 10;
+	int movespeed = 4;
 	int tank1_x = 60;
 	int tank1_y = 60;
 	int tank1_angle = 0;
@@ -85,14 +83,11 @@ int main() {
 	timer = al_create_timer(.02);
 	event_queue = al_create_event_queue();
 	font = al_create_builtin_font();
-	win = al_load_sample("Victory.wav");
-	bite = al_load_sample("chomp.wav");
-	background = al_load_sample("Pacman.wav");
 	instance = al_create_sample_instance(background);
 	al_set_sample_instance_playmode(instance, ALLEGRO_PLAYMODE_LOOP);
 	al_attach_sample_instance_to_mixer(instance, al_get_default_mixer());
 	al_play_sample_instance(instance);
-	display = al_create_display(800, 840);
+	display = al_create_display(screenwidth, screenheight);
 	tank1 = al_create_bitmap(tanksize, tanksize);
 	tank2 = al_create_bitmap(tanksize, tanksize);
 	wall = al_create_bitmap(wallsize, wallsize);
@@ -109,9 +104,11 @@ int main() {
 	al_clear_to_color(al_map_rgb(0, 0, 0));
 	al_flip_display();
 	al_start_timer(timer);
+	//game loop
 	while (doexit != true && tank1score < maxscore && tank2score < maxscore) {
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(event_queue, &ev);
+		//timer/movement section
 		if (ev.type == ALLEGRO_EVENT_TIMER) { //Movement section
 			if (tank1_angle < 0)
 				tank1_angle = 360;
@@ -121,20 +118,107 @@ int main() {
 				tank2_angle = 360;
 			if (tank2_angle > 360)
 				tank2_angle = 0;
-			if (p1keys[KEY_UP] && !Collision(tank1_x, tank1_y, tank1_angle, UP, playersize, map)) {
-			tank1_x += 4 * cos(3.14*tank1_angle / 180);
-			tank1_y += 4 * sin(3.14*tank1_angle / 180);
+			if (p1keys[KEY_UP] && !Collision(tank1_x, tank1_y, tank1_angle, UP, tanksize, map)) {
+				tank1_x += movespeed * cos(3.14*tank1_angle / 180);
+				tank1_y += movespeed * sin(3.14*tank1_angle / 180);
 			}
-			if (p1keys[KEY_DOWN] && !Collision(tank1_x, tank1_y, tank1_angle, DOWN, playersize, map)) {
-				tank1_x -= 4 * cos(3.14*tank1_angle / 180);
-				tank1_y -= 4 * sin(3.14*tank1_angle / 180);
+			if (p1keys[KEY_DOWN] && !Collision(tank1_x, tank1_y, tank1_angle, DOWN, tanksize, map)) {
+				tank1_x -= movespeed * cos(3.14*tank1_angle / 180);
+				tank1_y -= movespeed * sin(3.14*tank1_angle / 180);
 			}
 			if (p1keys[KEY_LEFT])
 				tank1_angle -= 1;
 			if (p1keys[KEY_RIGHT])
 				tank1_angle += 1;
-			if (p2keys[KEY_UP] && !Collision(tank2_x, tank2_y, tank1_angle, UP, playersize, map)) {
-				tank2_x += 4 * cos(3.14*tank2_angle / 180);
+			if (p2keys[KEY_UP] && !Collision(tank2_x, tank2_y, tank1_angle, UP, tanksize, map)) {
+				tank2_x += movespeed * cos(3.14*tank2_angle / 180);
+			}
+			if (p2keys[KEY_DOWN] && !Collision(tank2_x, tank2_y, tank2_angle, DOWN, tanksize, map)) {
+				tank2_x -= movespeed * cos(3.14*tank1_angle / 180);
+				tank2_y -= movespeed * sin(3.14*tank1_angle / 180);
+			}
+			if (p2keys[KEY_LEFT])
+				tank2_angle -= 1;
+			if (p2keys[KEY_RIGHT])
+				tank2_angle += 1;
+		
+			redraw = true;
+
+		}
+
+		else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+			break;
+		}
+
+		//key press algorithm		
+		else if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
+			switch (ev.keyboard.keycode) {
+			case ALLEGRO_KEY_UP:
+				p1keys[0] = true;
+				break;
+			case ALLEGRO_KEY_DOWN:
+				p1keys[1] = true;
+				break;
+			case ALLEGRO_KEY_LEFT:
+				p1keys[2] = true;
+				break;
+			case ALLEGRO_KEY_RIGHT:
+				p1keys[3] = true;
+				break;
+			case ALLEGRO_KEY_M:
+				p1keys[4] = true;
+				break;
+			case ALLEGRO_KEY_W:
+				p2keys[0] = true;
+				break;
+			case ALLEGRO_KEY_S:
+				p2keys[1] = true;
+				break;
+			case ALLEGRO_KEY_A:
+				p2keys[2] = true;
+				break;
+			case ALLEGRO_KEY_D:
+				p2keys[3] = true;
+				break;
+			case ALLEGRO_KEY_Q:
+				p2keys[4] = true;
+				break;
+			case ALLEGRO_KEY_ESCAPE:
+				doexit = true;
+			}
+		}
+		else if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
+			switch (ev.keyboard.keycode) {
+			case ALLEGRO_KEY_UP:
+				p1keys[0] = false;
+				break;
+			case ALLEGRO_KEY_DOWN:
+				p1keys[1] = false;
+				break;
+			case ALLEGRO_KEY_LEFT:
+				p1keys[2] = false;
+				break;
+			case ALLEGRO_KEY_RIGHT:
+				p1keys[3] = false;
+				break;
+			case ALLEGRO_KEY_M:
+				p1keys[4] = false;
+				break;
+			case ALLEGRO_KEY_W:
+				p2keys[0] = false;
+				break;
+			case ALLEGRO_KEY_S:
+				p2keys[1] = false;
+				break;
+			case ALLEGRO_KEY_A:
+				p2keys[2] = false;
+				break;
+			case ALLEGRO_KEY_D:
+				p2keys[3] = false;
+				break;
+			case ALLEGRO_KEY_Q:
+				p2keys[4] = false;
+				break;
 			}
 		}
 		//render section
@@ -151,25 +235,26 @@ int main() {
 					if (map[j][i] == 1)
 						al_draw_bitmap(wall, i * wallsize, j * wallsize, 0);
 
-			al_draw_rotated_bitmap(tank1, tanksize/2, tanksize/2, tank1_x, tank1_y, tank1_angle, 0);
-			al_draw_rotated_bitmap(tank2, tanksize/2, tanksize/2, tank2_x, tank2_y, tank2_angle, 0);
+			al_draw_rotated_bitmap(tank1, tanksize / 2, tanksize / 2, tank1_x, tank1_y, tank1_angle, 0);
+			al_draw_rotated_bitmap(tank2, tanksize / 2, tanksize / 2, tank2_x, tank2_y, tank2_angle, 0);
 			al_flip_display();
-	}
+		}
 
-
-bool Collision(int x, int y, int angle, int dir, int size, int map[120][80]) {
-	int NewX;
-	int NewY;
-	if (dir == UP) {
-		NewX = x + (4 + playersize) * cos(angle / 180);
-		NewY = y + (4 + playersize) * sin(angle / 180);
 	}
-	else {
-		NewX = x - (4 + playersize) * cos(angle / 180);
-		NewY = y - (4 + playersize) * sin(angle / 180);
-	}
-	if (map[NewX / 10][NewY / 10] == 1)
-		return 1;
-	else
-		return false;
 }
+//bool Collision(int x, int y, int angle, int dir, int size, int map[120][80]) {
+//	int NewX;
+//	int NewY;
+//	if (dir == UP) {
+//		NewX = x + (4 + size) * cos(angle / 180);
+//		NewY = y + (4 + size) * sin(angle / 180);
+//	}
+//	else {
+//		NewX = x - (4 + size) * cos(angle / 180);
+//		NewY = y - (4 + size) * sin(angle / 180);
+//	}
+//	if (map[NewX / 10][NewY / 10] == 1)
+//		return true;
+//	else
+//		return false;
+//}
