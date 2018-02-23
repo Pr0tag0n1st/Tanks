@@ -119,7 +119,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AndMakeItTrouble.cpp" />
-    <ClCompile Include="AndTankItDouble.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
