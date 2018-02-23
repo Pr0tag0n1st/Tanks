@@ -8,17 +8,17 @@
 #include <allegro5/allegro_ttf.h>
 #include <vector>
 using namespace std;
-const int screenwidth = 1200;
-const int screenheight = 800;
+const int SCREEN_W = 1200;
+const int SCREEN_H = 800;
 enum KEYS1 { KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_M};
 enum KEYS2 { KEY_W, KEY_S, KEY_A, KEY_D, KEY_Q };
 enum DIRECTIONS { UP, DOWN, LEFT, RIGHT };
-//bool Collision(int x, int y, int angle, int dir, int size, int map[120][80]);
+bool Collision(int x, int y, int angle, int dir, int size, int map[120][80]);
 
 int main() {
 	bool p1keys[5]{ false, false, false, false, false };
 	bool p2keys[5]{ false, false, false, false, false };
-	ALLEGRO_DISPLAY*display = NULL;
+	ALLEGRO_DISPLAY *display = NULL;
 	ALLEGRO_TIMER*timer = NULL;
 	ALLEGRO_EVENT_QUEUE*event_queue = NULL;
 	ALLEGRO_BITMAP*tank1 = NULL;
@@ -79,31 +79,46 @@ int main() {
 	for (int i = 0; i < 120; i++)
 		for (int j = 0; j < 80; j++)
 			cout << map[i][j];
-	al_install_keyboard();
-	timer = al_create_timer(.02);
-	event_queue = al_create_event_queue();
-	font = al_create_builtin_font();
-	instance = al_create_sample_instance(background);
-	al_set_sample_instance_playmode(instance, ALLEGRO_PLAYMODE_LOOP);
-	al_attach_sample_instance_to_mixer(instance, al_get_default_mixer());
-	al_play_sample_instance(instance);
-	display = al_create_display(screenwidth, screenheight);
+	//initializing allegro
+	al_init();
+	al_init_image_addon();
+	al_install_audio();
+	al_init_acodec_addon();
+	al_init_font_addon();
+	al_init_ttf_addon();
+	al_init_primitives_addon();
+	//initializing variables
+	display = al_create_display(SCREEN_W, SCREEN_H);
 	tank1 = al_create_bitmap(tanksize, tanksize);
 	tank2 = al_create_bitmap(tanksize, tanksize);
 	wall = al_create_bitmap(wallsize, wallsize);
+	event_queue = al_create_event_queue();
+	font = al_create_builtin_font();
+	instance = al_create_sample_instance(background);
+	//coloring bitmaps
 	al_set_target_bitmap(tank1);
 	al_clear_to_color(al_map_rgb(255, 255, 0));
 	al_set_target_bitmap(tank2);
 	al_clear_to_color(al_map_rgb(255, 255, 0));
 	al_set_target_bitmap(wall);
 	al_clear_to_color(al_map_rgb(200, 200, 255));
-	al_set_target_bitmap(al_get_backbuffer(display));
+
+//	al_set_sample_instance_playmode(instance, ALLEGRO_PLAYMODE_LOOP);
+//	al_attach_sample_instance_to_mixer(instance, al_get_default_mixer());
+//	al_play_sample_instance(instance);
+	cout << "flag 1";
+	//initializing event sources
+//	al_get_backbuffer(display);
 	al_register_event_source(event_queue, al_get_display_event_source(display));
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
+	al_install_keyboard();
+	timer = al_create_timer(.02);
 	al_clear_to_color(al_map_rgb(0, 0, 0));
 	al_flip_display();
+	al_rest(3.0);
 	al_start_timer(timer);
+	cout << "flag bip";
 	//game loop
 	while (doexit != true && tank1score < maxscore && tank2score < maxscore) {
 		ALLEGRO_EVENT ev;
@@ -187,7 +202,7 @@ int main() {
 				doexit = true;
 			}
 		}
-		else if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
+		else if (ev.type == ALLEGRO_EVENT_KEY_UP) {
 			switch (ev.keyboard.keycode) {
 			case ALLEGRO_KEY_UP:
 				p1keys[0] = false;
@@ -241,20 +256,25 @@ int main() {
 		}
 
 	}
+	al_destroy_bitmap(tank1);
+	al_destroy_bitmap(tank2);
+	al_destroy_timer(timer);
+	al_destroy_event_queue(event_queue);
+	al_destroy_display(display);
 }
-//bool Collision(int x, int y, int angle, int dir, int size, int map[120][80]) {
-//	int NewX;
-//	int NewY;
-//	if (dir == UP) {
-//		NewX = x + (4 + size) * cos(angle / 180);
-//		NewY = y + (4 + size) * sin(angle / 180);
-//	}
-//	else {
-//		NewX = x - (4 + size) * cos(angle / 180);
-//		NewY = y - (4 + size) * sin(angle / 180);
-//	}
-//	if (map[NewX / 10][NewY / 10] == 1)
-//		return true;
-//	else
-//		return false;
-//}
+bool Collision(int x, int y, int angle, int dir, int size, int map[120][80]) {
+	int NewX;
+	int NewY;
+	if (dir == UP) {
+		NewX = x + (4 + size) * cos(angle / 180);
+		NewY = y + (4 + size) * sin(angle / 180);
+	}
+	else {
+		NewX = x - (4 + size) * cos(angle / 180);
+		NewY = y - (4 + size) * sin(angle / 180);
+	}
+	if (map[NewX / 10][NewY / 10] == 1)
+		return true;
+	else
+		return false;
+}
