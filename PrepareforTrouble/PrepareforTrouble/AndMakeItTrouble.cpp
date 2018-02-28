@@ -16,6 +16,8 @@ enum DIRECTIONS { UP, DOWN, LEFT, RIGHT };
 bool Collision(int x, int y, int angle, int dir, int size, int map[120][80]);
 
 int main() {
+
+	
 	bool p1keys[5]{ false, false, false, false, false };
 	bool p2keys[5]{ false, false, false, false, false };
 	ALLEGRO_DISPLAY *display = NULL;
@@ -52,18 +54,15 @@ int main() {
 				map[i][j] = 1;
 			else if (i == 40 && j >= 40)
 				map[i][j] = 1;
-			else if (i == 55 && j <= 20)
+			else if (i == 50 && j <= 20)
 				map[i][j] = 1;
-			else if (i == 75 && j >= 60)
+			else if (i == 70 && j >= 60)
 				map[i][j] = 1;
 			else if (i == 100 && j <= 20)
 				map[i][j] = 1;
-			else if (i <= 20 && j == 40)
-				map[i][j] = 1;
 			else if (40 < i && j == 60)
 				map[i][j] = 1;
-			else if (i < 60 && j == 60)
-				map[i][j] = 1;
+
 			else if (80 < i && j == 40)
 				map[i][j] = 1;
 			else if (i < 90 && j == 40)
@@ -93,32 +92,31 @@ int main() {
 	tank2 = al_create_bitmap(tanksize, tanksize);
 	wall = al_create_bitmap(wallsize, wallsize);
 	event_queue = al_create_event_queue();
-	font = al_create_builtin_font();
-	instance = al_create_sample_instance(background);
+	font = al_load_ttf_font("pepperoni_pizza.ttf", 48, 0);
 	//coloring bitmaps
 	al_set_target_bitmap(tank1);
-	al_clear_to_color(al_map_rgb(255, 255, 0));
+	al_clear_to_color(al_map_rgb(0, 255, 0));
 	al_set_target_bitmap(tank2);
-	al_clear_to_color(al_map_rgb(255, 255, 0));
+	al_clear_to_color(al_map_rgb(255, 0, 0));
 	al_set_target_bitmap(wall);
 	al_clear_to_color(al_map_rgb(200, 200, 255));
-
+//	instance = al_create_sample_instance(background);
 //	al_set_sample_instance_playmode(instance, ALLEGRO_PLAYMODE_LOOP);
 //	al_attach_sample_instance_to_mixer(instance, al_get_default_mixer());
 //	al_play_sample_instance(instance);
 	cout << "flag 1";
+	timer = al_create_timer(.02);
 	//initializing event sources
-//	al_get_backbuffer(display);
+	al_set_target_bitmap(al_get_backbuffer(display));
 	al_register_event_source(event_queue, al_get_display_event_source(display));
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
-	al_register_event_source(event_queue, al_get_keyboard_event_source());
 	al_install_keyboard();
-	timer = al_create_timer(.02);
+	al_register_event_source(event_queue, al_get_keyboard_event_source());
 	al_clear_to_color(al_map_rgb(0, 0, 0));
 	al_flip_display();
-	al_rest(3.0);
 	al_start_timer(timer);
 	cout << "flag bip";
+
 	//game loop
 	while (doexit != true && tank1score < maxscore && tank2score < maxscore) {
 		ALLEGRO_EVENT ev;
@@ -145,8 +143,9 @@ int main() {
 				tank1_angle -= 1;
 			if (p1keys[KEY_RIGHT])
 				tank1_angle += 1;
-			if (p2keys[KEY_UP] && !Collision(tank2_x, tank2_y, tank1_angle, UP, tanksize, map)) {
+			if (p2keys[KEY_UP] && !Collision(tank2_x, tank2_y, tank2_angle, UP, tanksize, map)) {
 				tank2_x += movespeed * cos(3.14*tank2_angle / 180);
+				tank2_y += movespeed * sin(3.14*tank2_angle / 180);
 			}
 			if (p2keys[KEY_DOWN] && !Collision(tank2_x, tank2_y, tank2_angle, DOWN, tanksize, map)) {
 				tank2_x -= movespeed * cos(3.14*tank1_angle / 180);
@@ -242,17 +241,17 @@ int main() {
 
 			//paint black over the old screen, so the old square dissapears
 			al_clear_to_color(al_map_rgb(0, 0, 0));
-
 			//the algorithm above just changes the x and y coordinates
 			//here's where the bitmap is actually drawn somewhere else
 			for (int i = 0; i < 120; i++)
 				for (int j = 0; j < 80; j++)
-					if (map[j][i] == 1)
+					if (map[i][j] == 1)
 						al_draw_bitmap(wall, i * wallsize, j * wallsize, 0);
 
-			al_draw_rotated_bitmap(tank1, tanksize / 2, tanksize / 2, tank1_x, tank1_y, tank1_angle, 0);
-			al_draw_rotated_bitmap(tank2, tanksize / 2, tanksize / 2, tank2_x, tank2_y, tank2_angle, 0);
+			al_draw_rotated_bitmap(tank1, tanksize / 2, tanksize / 2, tank1_x, tank1_y, ((tank1_angle*3.14)/180), 0);
+			al_draw_rotated_bitmap(tank2, tanksize / 2, tanksize / 2, tank2_x, tank2_y, ((tank2_angle*3.14)/180), 0);
 			al_flip_display();
+
 		}
 
 	}
