@@ -47,6 +47,9 @@ int main() {
 	int tank1score = 0;
 	int tank2score = 0;
 	int maxscore = 10;
+	int dir1=1;
+	int dir2=1;
+
 	int map[120][80];
 	for (int i = 0; i < 120; i++) {
 		for (int j = 0; j < 80; j++) {
@@ -134,27 +137,39 @@ int main() {
 			if (p1keys[KEY_UP] && !Collision(tank1_x, tank1_y, tank1_angle, UP, tanksize, map)) {
 				tank1_x += movespeed * cos(3.14*tank1_angle / 180);
 				tank1_y += movespeed * sin(3.14*tank1_angle / 180);
+				dir1 = 0;
 			}
 			if (p1keys[KEY_DOWN] && !Collision(tank1_x, tank1_y, tank1_angle, DOWN, tanksize, map)) {
 				tank1_x -= movespeed * cos(3.14*tank1_angle / 180);
 				tank1_y -= movespeed * sin(3.14*tank1_angle / 180);
+				dir1 = 1;
 			}
-			if (p1keys[KEY_LEFT])
-				tank1_angle -= 1;
-			if (p1keys[KEY_RIGHT])
-				tank1_angle += 1;
+			if (p1keys[KEY_LEFT]) {
+				tank1_angle -= 2;
+				dir1 = 2;
+			}
+			if (p1keys[KEY_RIGHT]) {
+				tank1_angle += 2;
+				dir1 = 3;
+			}
 			if (p2keys[KEY_UP] && !Collision(tank2_x, tank2_y, tank2_angle, UP, tanksize, map)) {
 				tank2_x += movespeed * cos(3.14*tank2_angle / 180);
 				tank2_y += movespeed * sin(3.14*tank2_angle / 180);
+				dir2 = 0;
 			}
 			if (p2keys[KEY_DOWN] && !Collision(tank2_x, tank2_y, tank2_angle, DOWN, tanksize, map)) {
-				tank2_x -= movespeed * cos(3.14*tank1_angle / 180);
-				tank2_y -= movespeed * sin(3.14*tank1_angle / 180);
+				tank2_x -= movespeed * cos(3.14*tank2_angle / 180);
+				tank2_y -= movespeed * sin(3.14*tank2_angle / 180);
+				dir2 = 1;
 			}
-			if (p2keys[KEY_LEFT])
-				tank2_angle -= 1;
-			if (p2keys[KEY_RIGHT])
-				tank2_angle += 1;
+			if (p2keys[KEY_LEFT]) {
+				tank2_angle -= 2;
+				dir2 = 2;
+			}
+			if (p2keys[KEY_RIGHT]) {
+				tank2_angle += 2;
+				dir2 = 3;
+			}
 		
 			redraw = true;
 
