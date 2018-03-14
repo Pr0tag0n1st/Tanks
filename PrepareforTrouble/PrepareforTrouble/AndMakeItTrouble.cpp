@@ -41,7 +41,7 @@ int main() {
 	int tank1_x = 60;
 	int tank1_y = 60;
 	int tank1_angle = 0;
-	int tank2_angle = 0;
+	int tank2_angle = 90;
 	int tank2_x = 1120;
 	int tank2_y = 60;
 	int tank1score = 0;
@@ -55,31 +55,30 @@ int main() {
 		for (int j = 0; j < 80; j++) {
 			if (i == 0 || j == 0)
 				map[i][j] = 1;
-			else if (i == 40 && j >= 40)
+
+			else if (i == 119 || j == 79)
 				map[i][j] = 1;
+
 			else if (i == 50 && j <= 20)
 				map[i][j] = 1;
-			else if (i == 70 && j >= 60)
-				map[i][j] = 1;
+
 			else if (i == 100 && j <= 20)
 				map[i][j] = 1;
 			else if (40 < i && j == 60)
 				map[i][j] = 1;
 
-			else if (80 < i && j == 40)
-				map[i][j] = 1;
+
 			else if (i < 90 && j == 40)
 				map[i][j] = 1;
-			else if (105 < i && j == 40)
-				map[i][j] = 1;
-			else if (i < 120 && j == 40)
-				map[i][j] = 1;
+
+
+	
 			else
 				map[i][j] = 0;
 		}
 	}
-	for (int i = 0; i < 120; i++)
-		for (int j = 0; j < 80; j++)
+	for (int i = 0; i <= 120; i++)
+		for (int j = 0; j <= 80; j++)
 			cout << map[i][j];
 	//initializing allegro
 	al_init();
@@ -145,11 +144,11 @@ int main() {
 				dir1 = 1;
 			}
 			if (p1keys[KEY_LEFT]) {
-				tank1_angle -= 2;
+				tank1_angle -= 4;
 				dir1 = 2;
 			}
 			if (p1keys[KEY_RIGHT]) {
-				tank1_angle += 2;
+				tank1_angle += 4;
 				dir1 = 3;
 			}
 			if (p2keys[KEY_UP] && !Collision(tank2_x, tank2_y, tank2_angle, UP, tanksize, map)) {
@@ -163,11 +162,11 @@ int main() {
 				dir2 = 1;
 			}
 			if (p2keys[KEY_LEFT]) {
-				tank2_angle -= 2;
+				tank2_angle -= 4;
 				dir2 = 2;
 			}
 			if (p2keys[KEY_RIGHT]) {
-				tank2_angle += 2;
+				tank2_angle += 4;
 				dir2 = 3;
 			}
 		
